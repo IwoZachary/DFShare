@@ -3,7 +3,7 @@
 <a href="http://localhost:8000/logout">Logout</a>
 
 
-<form method="post">{% csrf_token %}
+<form method="post" enctype="multipart/form-data">{% csrf_token %}
 	{% for field in file_form %}
 		<p>
 			{{field.label_tag}}
@@ -18,7 +18,14 @@
 			{% endfor %}
 		</p>
 	{% endfor %}
-    <input type="file" name="fileToUpload" id="fileToUpload">
 	<button type="submit">Upload</button>
 	
 </form>
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+<a href="http://localhost:8000/my_files">my files</a>

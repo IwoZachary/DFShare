@@ -1,5 +1,5 @@
 from django.contrib import admin
-from myapp.models import Account
+from myapp.models import Account, FileMod
 from django.contrib.auth.admin import UserAdmin
 
 class AccountAdmin(UserAdmin):
@@ -10,4 +10,7 @@ class AccountAdmin(UserAdmin):
     list_filter = ()
     fieldsets = ()
 
+class FileAdmin(admin.ModelAdmin):
+   fields = ('upload_date', "is_public")
 admin.site.register(Account, AccountAdmin)
+admin.site.register(FileMod, FileAdmin)

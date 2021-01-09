@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.forms import  UserCreationForm
 
 
-from myapp.models import Account, File
+from myapp.models import Account, FileMod
 
 class RegistrationForm(UserCreationForm):
     email = forms.EmailField(max_length=60, help_text='Required valid email')
@@ -29,5 +29,5 @@ class AccountAuthenticationForm(forms.ModelForm):
 
 class FileForm(forms.ModelForm):
     class Meta:
-        model = File
-        fields = ["name", "is_public"]
+        model = FileMod
+        fields = ["is_public", "fileF"]

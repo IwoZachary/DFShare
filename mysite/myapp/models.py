@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db.models.fields.files import FileField
+from django.core.files.storage import FileSystemStorage
 # Create your models here.
 
 class MyAccountManager(BaseUserManager):
@@ -58,12 +59,12 @@ class Account(AbstractBaseUser):
     def has_module_perms(self, app_label):
         return True
 
-class File(models.Model):
-    owner = models.ForeignKey(Account, on_delete=models.CASCADE)
-    name = models.CharField(verbose_name="name", max_length=60)
+
+class FileMod(models.Model):
+    owner = models.ForeignKey( Account,default = 1, null = True, on_delete=models.CASCADE)
     upload_date = models.DateTimeField(verbose_name="upload_date", auto_now_add=True)
-    file = FileField(upload_to="uploads")
+    fileF = FileField(upload_to="uploads", null=False, blank= False)
     is_public = models.BooleanField(verbose_name="is_public", default=False)
 
     def __str__(self):
-        return self.name
+        return self.fileF.name

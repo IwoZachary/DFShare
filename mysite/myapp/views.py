@@ -3,7 +3,12 @@ from django.shortcuts import render, redirect
 from .forms import FileForm
 from django.contrib.auth import login, authenticate, logout
 from myapp.forms import RegistrationForm
-from myapp.forms import AccountAuthenticationForm, File
+from myapp.forms import AccountAuthenticationForm, FileMod
+from django.contrib import messages
+from django.http import HttpResponse
+import os
+from django.http import FileResponse
+from django.views.static import serve
 
 def home(request):
     return render(request, 'myapp/home.html')
@@ -31,17 +36,19 @@ def user_home_view(request):
     if request.user.is_authenticated:
         if request.POST:
             form = FileForm(request.POST, request.FILES)
-            if form.is_valid():
-                fs = FileSystemStorage()
-                name = fs.save(request.FILES['file'])
-                context['url'] = fs.url(name)
-                return redirect(request,'myapp/user_home.html',)
+            if form.is_valid() and request.FILES != None :
+                form.owner = request.user
+                form.save()
+                messages.success(request, 'file added')
+            else:
+                form = FileForm()
+                context['file_form'] = form
         else:
             form = FileForm()
             context['file_form'] = form
-            return render( request, 'myapp/user_home.html', context)
+        return render( request, 'myapp/user_home.html', context)
     else:
-        return redirect('home')
+        return redirect('home',request)
 
 def logout_view(request):
     logout(request)
@@ -66,6 +73,31 @@ def login_view(request):
         form = AccountAuthenticationForm()
         context['login_form'] = form
     return render(request, "myapp/login.html", context)
+
+def my_files(request):
+    context = {}
+    user=request.user
+    if user.is_authenticated:
+        if request.POST:
+            req=request.POST['action'].split("|")
+            file= FileMod.objects.filter(id=int(req[1])).first()
+            file_name= file.__str__()
+            if req[0] =="DELETE":
+                os.remove(file_name)
+                FileMod.objects.filter(id=request.POST['action']).delete()
+            if req[0] == "DOWNLOAD":
+                f = open(file_name, 'rb')
+                response =FileResponse(f)    
+                response['Content-Disposition']='attachment;filename='+file_name 
+                return response
+                
+        context['files']=FileMod.objects.all().filter(owner=user)
+        return render(request, 'myapp/my_files.html', context)
+    else:
+        return redirect('home',request)
+
+
+
 
 
 

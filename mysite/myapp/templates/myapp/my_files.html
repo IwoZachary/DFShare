@@ -1,0 +1,16 @@
+<h2>My files</h2>
+<form method="post" enctype="multipart/form-data">{% csrf_token %}
+	{% for field in files %}
+		<p>
+			
+			{{field.fileF.name}}
+			{{field.fileF.size}}
+			
+			<button type="submit" name="action" value=DELETE|{{field.id}}>Delete</button>
+			<button type="submit" name="action" value=DOWNLOAD|{{field.id}}>Download</button>
+			
+		</p>
+	{% endfor %}
+	
+</form>
+
