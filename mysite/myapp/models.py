@@ -1,7 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db.models.fields.files import FileField
-from django.core.files.storage import FileSystemStorage
+from django.db.models import UniqueConstraint
+import os
 # Create your models here.
 
 class MyAccountManager(BaseUserManager):
@@ -61,10 +62,20 @@ class Account(AbstractBaseUser):
 
 
 class FileMod(models.Model):
-    owner = models.ForeignKey( Account,default = 1, null = True, on_delete=models.CASCADE)
+    owner = models.ForeignKey( Account,blank=True,null=True, on_delete=models.CASCADE)
     upload_date = models.DateTimeField(verbose_name="upload_date", auto_now_add=True)
     fileF = FileField(upload_to="uploads", null=False, blank= False)
     is_public = models.BooleanField(verbose_name="is_public", default=False)
+    def __str__(self):
+        return os.path.basename(self.fileF.name)
+
+class SharedFile(models.Model):
+    fileS = models.ForeignKey(FileMod, null=False, on_delete=models.CASCADE)
+    userS = models.ForeignKey(Account, null=False, on_delete=models.CASCADE)
+
+    class Meta:
+        UniqueConstraint(fields = ['fileS', 'userS'], name = 'compositepk')
+
 
     def __str__(self):
-        return self.fileF.name
+        return self.fileF +" "+ self.userS

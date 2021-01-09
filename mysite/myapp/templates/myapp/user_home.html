@@ -4,20 +4,15 @@
 
 
 <form method="post" enctype="multipart/form-data">{% csrf_token %}
-	{% for field in file_form %}
 		<p>
-			{{field.label_tag}}
-			{{field}}
-
-			{% if field.help_text %}
-				<small style="color: grey;">{{field.help_text}}</small>
-			{% endif %}
-
-			{% for error in field.errors %}
-				<p style="color: red;">{{error}}</p>
-			{% endfor %}
+			{{file_form.is_public}}
+			{{file_form.is_public.label}}
 		</p>
-	{% endfor %}
+		<p>
+			{{file_form.fileF}}
+			{{file_form.fileF.label}}
+		</p>
+	
 	<button type="submit">Upload</button>
 	
 </form>

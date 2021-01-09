@@ -1,6 +1,7 @@
+from myapp.models import Account, SharedFile
 from django.core.files.storage import FileSystemStorage
 from django.shortcuts import render, redirect
-from .forms import FileForm
+from .forms import FileForm, ShareForm
 from django.contrib.auth import login, authenticate, logout
 from myapp.forms import RegistrationForm
 from myapp.forms import AccountAuthenticationForm, FileMod
@@ -37,8 +38,9 @@ def user_home_view(request):
         if request.POST:
             form = FileForm(request.POST, request.FILES)
             if form.is_valid() and request.FILES != None :
-                form.owner = request.user
-                form.save()
+                obj = form.save(commit=False)
+                obj.owner = request.user
+                obj.save()
                 messages.success(request, 'file added')
             else:
                 form = FileForm()
@@ -48,7 +50,7 @@ def user_home_view(request):
             context['file_form'] = form
         return render( request, 'myapp/user_home.html', context)
     else:
-        return redirect('home',request)
+        return redirect('home')
 
 def logout_view(request):
     logout(request)
@@ -80,18 +82,25 @@ def my_files(request):
     if user.is_authenticated:
         if request.POST:
             req=request.POST['action'].split("|")
-            file= FileMod.objects.filter(id=int(req[1])).first()
-            file_name= file.__str__()
             if req[0] =="DELETE":
+                file= FileMod.objects.filter(id=int(req[1])).first()
+                file_name= file.fileF.name
+                FileMod.objects.filter(id=int(req[1])).delete()
                 os.remove(file_name)
-                FileMod.objects.filter(id=request.POST['action']).delete()
             if req[0] == "DOWNLOAD":
+                file= FileMod.objects.filter(id=int(req[1])).first()
+                file_name= file.fileF.name
                 f = open(file_name, 'rb')
                 response =FileResponse(f)    
-                response['Content-Disposition']='attachment;filename='+file_name 
+                response['Content-Disposition']='attachment;filename='+file.__str__()
                 return response
+            if req[0] == "SHARE":
+                form=ShareForm(request.POST)
+                form.save()
                 
         context['files']=FileMod.objects.all().filter(owner=user)
+        context['share']=ShareForm
+
         return render(request, 'myapp/my_files.html', context)
     else:
         return redirect('home',request)
