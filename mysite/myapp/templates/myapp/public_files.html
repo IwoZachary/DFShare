@@ -1,0 +1,14 @@
+<form method="post" enctype="multipart/form-data">{% csrf_token %}
+	{% for field in files %}
+		<p>
+			
+			{{field.fileF.name}}
+			{{field.fileF.size}}
+			
+			<button type="submit" name="action" value=DOWNLOAD|{{field.id}}>Download</button>
+			{{opinion.rate}}
+			<button type="submit" name="action" value=RATE|{{field.id}}>RATE</button>
+		</p>
+	{% endfor %}
+	
+</form>

@@ -3,7 +3,26 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db.models.fields.files import FileField
 from django.db.models import UniqueConstraint
 import os
-# Create your models here.
+from django_enumfield import enum
+from enum import Enum
+
+class Rate(enum.Enum):
+    ONE = 1
+    TWO = 2
+    THREE = 3
+    FOUR = 4
+    FIVE = 5
+
+    __default__ = FIVE
+
+class Action(enum.Enum):
+    UPLOAD = 1
+    LOGIN = 2
+    LOGOUT = 3
+    DOWNLOAD = 4
+    DELETE = 5
+    SHARE = 6
+    RATE = 7
 
 class MyAccountManager(BaseUserManager):
 
@@ -79,3 +98,17 @@ class SharedFile(models.Model):
 
     def __str__(self):
         return self.fileF +" "+ self.userS
+
+class Opinion(models.Model):
+    fileS = models.ForeignKey(FileMod,blank=True, null=False, on_delete=models.CASCADE)
+    userS = models.ForeignKey(Account,blank=True, null=False, on_delete=models.CASCADE)
+    rate = enum.EnumField(Rate)
+
+    class Meta:
+        UniqueConstraint(fields = ['fileS', 'userS'], name = 'compositepk')
+
+class Logs(models.Model):
+    userS = models.ForeignKey(Account, null=False, on_delete=models.CASCADE)
+    action_date = models.DateTimeField(verbose_name="action_date", auto_now_add=True)
+    action = enum.EnumField(Action)
+    
