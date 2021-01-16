@@ -22,8 +22,8 @@ class AccountAuthenticationForm(forms.ModelForm):
         fields= ('email', 'password')
     
     def clean(self):
-        email = self.cleaned_data['email']
-        password = self.cleaned_data['password']
+        email = self.cleaned_data.get('email')
+        password = self.cleaned_data.get('password')
         if not authenticate(email=email, password=password):
             raise forms.ValidationError("Invalid login")
 
@@ -37,6 +37,9 @@ class ShareForm(forms.ModelForm):
     class Meta:
         model = SharedFile
         fields = ['fileS', 'userS']
+
+    
+
 
 
 class OpinionForm(forms.ModelForm):

@@ -89,7 +89,7 @@ class FileMod(models.Model):
         return os.path.basename(self.fileF.name)
 
 class SharedFile(models.Model):
-    fileS = models.ForeignKey(FileMod, null=False, on_delete=models.CASCADE)
+    fileS = models.ForeignKey(FileMod, null=False, blank=True, on_delete=models.CASCADE)
     userS = models.ForeignKey(Account, null=False, on_delete=models.CASCADE)
 
     class Meta:

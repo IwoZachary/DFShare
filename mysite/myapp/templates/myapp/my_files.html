@@ -1,6 +1,7 @@
 <h2>My files</h2>
-<form method="post" enctype="multipart/form-data">{% csrf_token %}
+
 	{% for field in files %}
+	<form method="post">{% csrf_token %}
 		<p>
 			
 			{{field.fileF.name}}
@@ -8,23 +9,15 @@
 			
 			<button type="submit" name="action" value=DELETE|{{field.id}}>Delete</button>
 			<button type="submit" name="action" value=DOWNLOAD|{{field.id}}>Download</button>
-			
+			{{share.userS}}
+			{{share.userS.label}}
+			<button type="submit" name="action" value=SHARE|{{field.id}}>Share</button>
 			
 		</p>
+		</form>
 	{% endfor %}
 	
-</form>
 
-<form method="post" enctype="multipart/form-data">{% csrf_token %}
-	{% for field in share %}
-		<p>
-			
-			{{field}}
-			{{field.label}}
-			
-			
-		</p>
-	{% endfor %}
-	<button type="submit" name="action" value=SHARE>SHARE</button>
-</form>
+
+
 

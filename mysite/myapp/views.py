@@ -1,3 +1,4 @@
+from django.contrib.auth.models import AnonymousUser
 from myapp.models import Account, Action, SharedFile, Logs
 from django.core.files.storage import FileSystemStorage
 from django.shortcuts import render, redirect
@@ -67,17 +68,20 @@ def login_view(request):
     if request.POST:
         form=AccountAuthenticationForm(request.POST)
         if form.is_valid():
-            email=request.POST['email']
-            password=request.POST['password']
-            user = authenticate(email=email, password=password)
+            email=form.cleaned_data.get('email')
+            password=form.cleaned_data.get('password')
+            userl = authenticate(email=email, password=password)
 
-            if user:
-                login(request, user)
+            if userl is not None:
+                login(request, userl)
                 Logs.objects.create(userS = request.user, action = Action.LOGIN)
                 return redirect('user')
-    else:
-        form = AccountAuthenticationForm()
-        context['login_form'] = form
+
+            else:
+                messages.error(request, "email and password don't match")
+
+    form = AccountAuthenticationForm()
+    context['login_form'] = form
     return render(request, "myapp/login.html", context)
 
 def my_files(request):
@@ -86,24 +90,26 @@ def my_files(request):
     if user.is_authenticated:
         if request.POST:
             req=request.POST['action'].split("|")
+            file= FileMod.objects.filter(id=int(req[1])).first()
+            file_name= file.fileF.name
             if req[0] =="DELETE":
-                file= FileMod.objects.filter(id=int(req[1])).first()
-                file_name= file.fileF.name
                 FileMod.objects.filter(id=int(req[1])).delete()
                 os.remove(file_name)
                 Logs.objects.create(userS = request.user, action = Action.DELETE)
             if req[0] == "DOWNLOAD":
-                file= FileMod.objects.filter(id=int(req[1])).first()
-                file_name= file.fileF.name
                 f = open(file_name, 'rb')
                 response =FileResponse(f)    
                 response['Content-Disposition']='attachment;filename='+file.__str__()
                 Logs.objects.create(userS = request.user, action = Action.DOWNLOAD)
                 return response
             if req[0] == "SHARE":
+
                 form=ShareForm(request.POST)
-                form.save()
-                Logs.objects.create(userS = request.user, action = Action.SHARE)
+                if form.is_valid():
+                    share=form.save(commit=False)
+                    share.fileS=file
+                    share.save()
+                    Logs.objects.create(userS = request.user, action = Action.SHARE)
                 
         context['files']=FileMod.objects.all().filter(owner=user)
         context['share']=ShareForm
@@ -137,9 +143,7 @@ def public_files(request):
                         obj.userS = user
                         obj.save()
                         Logs.objects.create(userS = request.user, action = Action.RATE)
-                
-        else:
-            pass
+        
         context['files']=FileMod.objects.all().filter(is_public=True)
         context["opinion"]=OpinionForm
         return render(request, 'myapp/public_files.html', context)
@@ -161,8 +165,7 @@ def shared_files(request):
                 response['Content-Disposition']='attachment;filename='+file.__str__()
                 Logs.objects.create(userS = request.user, action = Action.DOWNLOAD)
                 return response
-            
-                
+        
         else:
             pass
         shared = SharedFile.objects.all().filter(userS = user)
@@ -170,6 +173,24 @@ def shared_files(request):
         return render(request, 'myapp/shared_files.html', context)
     else:
         return redirect('home', request)
+
+def public(request):
+    context = {}
+    if request.POST:
+            req=request.POST['action'].split("|")
+            file= FileMod.objects.filter(id=int(req[1])).first()
+            if req[0] == "DOWNLOAD":                
+                file_name= file.fileF.name
+                f = open(file_name, 'rb')
+                response =FileResponse(f)    
+                response['Content-Disposition']='attachment;filename='+file.__str__()
+                return response
+    else:
+        pass
+    context['files']=FileMod.objects.all().filter(is_public=True)
+    return render(request, 'myapp/public.html', context)   
+
+
 
 
 

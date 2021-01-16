@@ -1,5 +1,5 @@
-<form method="post" enctype="multipart/form-data">{% csrf_token %}
-	{% for field in files %}
+{% for field in files %}
+	<form method="post">{% csrf_token %}
 		<p>
 			
 			{{field.fileF.name}}
@@ -9,6 +9,6 @@
 			{{opinion.rate}}
 			<button type="submit" name="action" value=RATE|{{field.id}}>RATE</button>
 		</p>
+</form>
 	{% endfor %}
 	
-</form>
