@@ -1,0 +1,28 @@
+<h1>hello <h1>
+    
+<a href="http://localhost:8000/logout">Logout</a>
+
+
+<form method="post" enctype="multipart/form-data">{% csrf_token %}
+		<p>
+			{{file_form.is_public}}
+			{{file_form.is_public.label}}
+		</p>
+		<p>
+			{{file_form.fileF}}
+			{{file_form.fileF.label}}
+		</p>
+	
+	<button type="submit">Upload</button>
+	
+</form>
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+<a href="http://localhost:8000/my_files">my files</a>
+<a href="http://localhost:8000/public_files">public files</a>
+<a href="http://localhost:8000/shared_files">shared files</a>
