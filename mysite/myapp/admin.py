@@ -1,5 +1,5 @@
 from django.contrib import admin
-from myapp.models import Account, FileMod
+from myapp.models import Account, FileMod, Logs
 from django.contrib.auth.admin import UserAdmin
 
 class AccountAdmin(UserAdmin):
@@ -11,6 +11,11 @@ class AccountAdmin(UserAdmin):
     fieldsets = ()
 
 class FileAdmin(admin.ModelAdmin):
-   fields = ('upload_date', "is_public")
+   readonly_fields = ('upload_date', "is_public")
+
+class LogsAdmin(admin.ModelAdmin):
+   readonly_fields = ('userS', 'action', 'action_date')
+
 admin.site.register(Account, AccountAdmin)
 admin.site.register(FileMod, FileAdmin)
+admin.site.register(Logs, LogsAdmin)

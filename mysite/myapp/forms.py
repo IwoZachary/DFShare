@@ -31,7 +31,7 @@ class AccountAuthenticationForm(forms.ModelForm):
 class FileForm(forms.ModelForm):
     class Meta:
         model = FileMod
-        fields = ["is_public", "fileF","owner"]
+        fields = ["is_public", "fileF","owner","f_rate"]
 
 class ShareForm(forms.ModelForm):
     class Meta:

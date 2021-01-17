@@ -137,13 +137,13 @@ def public_files(request):
                 form = OpinionForm(request.POST)
                 if form.is_valid():                
                     obj = form.save(commit=False)
-                    opinion_exist = Opinion.objects.all().filter(fileS=file,userS=user)
-                    if opinion_exist == None:
-                        obj.fileS = file
-                        obj.userS = user
-                        obj.save()
-                        Logs.objects.create(userS = request.user, action = Action.RATE)
-        
+                    obj.fileS = file
+                    obj.userS = user
+                    obj.save()
+                    rates_num = Opinion.objects.all().filter(fileS=file)
+                    file.f_rate = (int(file.f_rate)*(len(rates_num)-1)+obj.rate)/len(rates_num)
+                    file.save()
+                    Logs.objects.create(userS = request.user, action = Action.RATE)
         context['files']=FileMod.objects.all().filter(is_public=True)
         context["opinion"]=OpinionForm
         return render(request, 'myapp/public_files.html', context)
@@ -165,9 +165,6 @@ def shared_files(request):
                 response['Content-Disposition']='attachment;filename='+file.__str__()
                 Logs.objects.create(userS = request.user, action = Action.DOWNLOAD)
                 return response
-        
-        else:
-            pass
         shared = SharedFile.objects.all().filter(userS = user)
         context['files']=FileMod.objects.all().filter(id__in =shared)
         return render(request, 'myapp/shared_files.html', context)
@@ -185,8 +182,6 @@ def public(request):
                 response =FileResponse(f)    
                 response['Content-Disposition']='attachment;filename='+file.__str__()
                 return response
-    else:
-        pass
     context['files']=FileMod.objects.all().filter(is_public=True)
     return render(request, 'myapp/public.html', context)   
 
