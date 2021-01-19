@@ -1,3 +1,4 @@
+from enum import unique
 from django.contrib.auth.models import AnonymousUser
 from myapp.models import Account, Action, SharedFile, Logs
 from django.core.files.storage import FileSystemStorage
@@ -42,15 +43,16 @@ def user_home_view(request):
             if form.is_valid() and request.FILES != None :
                 obj = form.save(commit=False)
                 obj.owner = request.user
+                obj.f_rate = 0
                 obj.save()
                 Logs.objects.create(userS = request.user, action = Action.UPLOAD)
-                messages.success(request, 'file added')
+                messages.success(request, 'File was added')
             else:
                 form = FileForm()
                 context['file_form'] = form
-        else:
-            form = FileForm()
-            context['file_form'] = form
+        
+        form = FileForm()
+        context['file_form'] = form
         return render( request, 'myapp/user_home.html', context)
     else:
         return redirect('home')
@@ -78,7 +80,7 @@ def login_view(request):
                 return redirect('user')
 
             else:
-                messages.error(request, "email and password don't match")
+               messages.success(request, 'Email and password dont match')
 
     form = AccountAuthenticationForm()
     context['login_form'] = form
@@ -107,9 +109,11 @@ def my_files(request):
                 form=ShareForm(request.POST)
                 if form.is_valid():
                     share=form.save(commit=False)
-                    share.fileS=file
-                    share.save()
-                    Logs.objects.create(userS = request.user, action = Action.SHARE)
+                    is_uniq = SharedFile.objects.all().filter(userS=share.userS, fileS=file)
+                    if len(is_uniq) ==0:
+                        share.fileS=file
+                        share.save()
+                        Logs.objects.create(userS = request.user, action = Action.SHARE)
                 
         context['files']=FileMod.objects.all().filter(owner=user)
         context['share']=ShareForm
@@ -135,13 +139,23 @@ def public_files(request):
                 return response
             if req[0] == "RATE":
                 form = OpinionForm(request.POST)
-                if form.is_valid():                
-                    obj = form.save(commit=False)
-                    obj.fileS = file
-                    obj.userS = user
-                    obj.save()
+                if form.is_valid():
+                    is_uniq = Opinion.objects.all().filter(userS=user, fileS=file)  
+                    if len(is_uniq) == 0:              
+                        obj = form.save(commit=False)
+                        obj.fileS = file
+                        obj.userS = user
+                        obj.save()
+                    else:
+                        for el in is_uniq:
+                            el.rate = form.cleaned_data.get('rate')
+                            el.save()
                     rates_num = Opinion.objects.all().filter(fileS=file)
-                    file.f_rate = (int(file.f_rate)*(len(rates_num)-1)+obj.rate)/len(rates_num)
+                    sum=0
+                    for el in rates_num:
+                        sum=sum+el.rate
+                    avg = int(sum/len(rates_num))
+                    file.f_rate = avg
                     file.save()
                     Logs.objects.create(userS = request.user, action = Action.RATE)
         context['files']=FileMod.objects.all().filter(is_public=True)

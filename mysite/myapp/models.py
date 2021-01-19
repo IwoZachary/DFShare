@@ -81,16 +81,16 @@ class Account(AbstractBaseUser):
 
 
 class FileMod(models.Model):
-    owner = models.ForeignKey( Account,blank=True,null=True, on_delete=models.CASCADE)
+    owner = models.ForeignKey( Account,blank=True,null=False, on_delete=models.CASCADE)
     upload_date = models.DateTimeField(verbose_name="upload_date", auto_now_add=True)
     fileF = FileField(upload_to="uploads", null=False, blank= False)
     is_public = models.BooleanField(verbose_name="is_public", default=False)
-    f_rate = models.IntegerField(verbose_name="file_rate", default=0)
+    f_rate = models.IntegerField(verbose_name="file_rate",blank=True, default=0)
     def __str__(self):
         return os.path.basename(self.fileF.name)
 
 class SharedFile(models.Model):
-    fileS = models.ForeignKey(FileMod,primary_key=True, null=False, blank=True, on_delete=models.CASCADE)
+    fileS = models.ForeignKey(FileMod, null=False, on_delete=models.CASCADE)
     userS = models.ForeignKey(Account, null=False, on_delete=models.CASCADE)
 
     class Meta:
@@ -101,8 +101,8 @@ class SharedFile(models.Model):
         return self.fileF +" "+ self.userS
 
 class Opinion(models.Model):
-    fileS = models.ForeignKey(FileMod,blank=True,primary_key=True, null=False, on_delete=models.CASCADE)
-    userS = models.ForeignKey(Account,blank=True, null=False, on_delete=models.CASCADE)
+    fileS = models.ForeignKey(FileMod,null=False, on_delete=models.CASCADE)
+    userS = models.ForeignKey(Account,null=False,  on_delete=models.CASCADE)
     rate = enum.EnumField(Rate)
 
     class Meta:

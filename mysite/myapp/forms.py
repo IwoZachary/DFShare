@@ -31,12 +31,12 @@ class AccountAuthenticationForm(forms.ModelForm):
 class FileForm(forms.ModelForm):
     class Meta:
         model = FileMod
-        fields = ["is_public", "fileF","owner","f_rate"]
+        fields = ["is_public", "fileF"]
 
 class ShareForm(forms.ModelForm):
     class Meta:
         model = SharedFile
-        fields = ['fileS', 'userS']
+        fields = ['userS']
 
     
 
@@ -46,7 +46,7 @@ class OpinionForm(forms.ModelForm):
     rate = EnumChoiceField(Rate)
     class Meta:
         model = Opinion
-        fields = ["fileS", "userS", "rate"]
+        fields = ["rate"]
 
 class LogsForm(forms.ModelForm):
     class Meta:

@@ -1,25 +1,44 @@
-<h2>My files</h2>
+{% extends 'base.html' %}
+{% block content %}
 
-	{% for field in files %}
-	<form method="post">{% csrf_token %}
-		<p>
-			
-			{{field.fileF.name}}
-			{{field.fileF.size}}
-			{{field.owner}}
-			{{field.owner}}
-			{{field.is_public}}
-			{{field.f_rate}}
-			<button type="submit" name="action" value=DELETE|{{field.id}}>Delete</button>
-			<button type="submit" name="action" value=DOWNLOAD|{{field.id}}>Download</button>
-			{{share.userS}}
-			{{share.userS.label}}
-			<button type="submit" name="action" value=SHARE|{{field.id}}>Share</button>
-			
-		</p>
-		</form>
-	{% endfor %}
-	
+    <table class="mt-3 table table-hover">
+        <tr class="table-header">
+            <th>Name:</th>
+            <th>Size:</th>
+            <th>Owner:</th>
+            <th>Is public:</th>
+            <th>Rating:</th>
+            <th>Delete:</th>
+            <th>Download:</th>
+            <th>Share:</th>
+
+
+        </tr>
+        {% for field in files %}
+            <form method="post">{% csrf_token %}
+
+                <tr>
+                <td>{{ field.fileF.name }}</td>
+                <td>{{ field.fileF.size }}</td>
+                <td>{{ field.owner }}</td>
+                <td>{{ field.is_public }}</td>
+                <td>{{ field.f_rate }}</td>
+                <td>
+                    <button type="submit" name="action" value=DELETE|{{ field.id }}>Delete</button>
+                </td>
+                <td>
+                    <button type="submit" name="action" value=DOWNLOAD|{{ field.id }}>Download</button>
+                </td>
+                <td>{{ share.userS }}
+                    {{ share.userS.label }}
+                    <button type="submit" name="action" value=SHARE|{{ field.id }}>Share</button>
+                </td>
+                </tr>
+
+            </form>
+        {% endfor %}
+    </table>
+{% endblock %}
 
 
 
