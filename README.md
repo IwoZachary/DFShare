@@ -6,5 +6,4 @@
  5. następnie wywołaj python manage.py makemigrate
  6. admina dodaj przez python manage.py createsuperuser
 7. w pliku settings.py ustawić na samym dole url na swoje lokalne
-8. i powinno działać
 9. serwer uruchom przez python manage.py runserver
