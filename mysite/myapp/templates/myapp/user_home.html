@@ -1,8 +1,11 @@
 {% extends 'base.html' %}
 {% block content %}
-
-    <div class="d-flex justify-content-center mt-3">
+{% load crispy_forms_tags %}
+    
+    <div class="row h-80 justify-content-center align-items-center">
         <div>
+            <h1>Upload your files</h1>
+            <br>
             <form class="card p-3" method="post" enctype="multipart/form-data">{% csrf_token %}
                 <p>
                     {{ file_form.is_public }}
@@ -16,9 +19,6 @@
 
             </form>
         </div>
-        <br>
-
-
     </div>
 <div class="d-flex justify-content-center mt-3">
 {% if messages %}

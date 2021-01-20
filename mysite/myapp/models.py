@@ -91,7 +91,7 @@ class FileMod(models.Model):
 
 class SharedFile(models.Model):
     fileS = models.ForeignKey(FileMod, null=False, on_delete=models.CASCADE)
-    userS = models.ForeignKey(Account, null=False, on_delete=models.CASCADE)
+    userS = models.ForeignKey(Account, null=False,blank=True, on_delete=models.CASCADE)
 
     class Meta:
         UniqueConstraint(fields = ['fileS', 'userS'], name = 'compositepk')
@@ -112,4 +112,7 @@ class Logs(models.Model):
     userS = models.ForeignKey(Account, null=False, on_delete=models.CASCADE)
     action_date = models.DateTimeField(verbose_name="action_date", auto_now_add=True)
     action = enum.EnumField(Action)
+
+    def __str__(self):
+        return self.userS.__str__()+" "+str(self.action_date)+ " "+str(self.action.name)
     

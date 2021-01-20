@@ -1,22 +1,13 @@
 {% extends 'authentication.html' %}
 {% block content %}
-
+{% load crispy_forms_tags %}
     <div class="d-flex justify-content-center mt-3">
         <div>
-            <h2>Register</h2>
+            <h1>Register</h1>
 
-        <form method="post">{% csrf_token %}
-            {% for field in registration_form %}
-                <p>
-                    {{ field.label_tag }}
-                    {{ field }}                   
-                    {% for error in field.errors %}
-                        <p style="color: red;">{{ error }}</p>
-                    {% endfor %}
-                </p>
-            {% endfor %}
+        <form class="card p-3" method="post">{% csrf_token %}
+            {{ registration_form|crispy }}
             <button type="submit">Register</button>
-
         </form>
         </div>
 
